@@ -98,10 +98,10 @@ disqusShortname = ""
       url = "blogs/biography"
 
     [[params.tiles.showcase]]
-      title = "Tempus"
-      subtitle = "Feugiat Amet Tempus"
+      title = "Project 1: Climate change"
+      subtitle = "Temperature deviations from the normal over time"
       image = "pic02.jpg"
-      url = "blogs/tempus"
+      url = "blogs/project1"
 
     [[params.tiles.showcase]]
       title = "Magna"
