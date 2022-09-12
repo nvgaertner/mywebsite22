@@ -100,14 +100,14 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "Project 1: Climate change"
       subtitle = "Temperature deviations from the normal over time"
-      image = "project1.jpg"
+      image = "project2.jpg"
       url = "blogs/project1"
 
     [[params.tiles.showcase]]
       title = "Magna"
       subtitle = "Lorem Etiam Nullam"
       image = "pic03.jpg"
-      url = "blogs/magna"
+      url = "blogs/project2"
 
     [[params.tiles.showcase]]
       title = "Ipsum"

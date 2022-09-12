@@ -1,0 +1,129 @@
+---
+title: "Project 2: GDP components"
+description: "Examine the influencing drivers of GDP"
+slug: "project1"
+image: project2.jpg
+keywords: ""
+categories: 
+    - ""
+    - ""
+date: 2017-10-31T22:42:51-05:00
+draft: false
+---
+
+
+
+<div id="challenge-2gdp-components-over-time-and-among-countries" class="section level1">
+<h1>Challenge 2:GDP components over time and among countries</h1>
+<p>At the risk of oversimplifying things, the main components of gross domestic product, GDP are personal consumption (C), business investment (I), government spending (G) and net exports (exports - imports). You can read more about GDP and the different approaches in calculating at the <a href="https://en.wikipedia.org/wiki/Gross_domestic_product">Wikipedia GDP page</a>.</p>
+<p>The GDP data we will look at is from the <a href="https://unstats.un.org/unsd/snaama/Downloads">United Nations’ National Accounts Main Aggregates Database</a>, which contains estimates of total GDP and its components for all countries from 1970 to today. We will look at how GDP and its components have changed over time, and compare different countries and how much each component contributes to that country’s GDP. The file we will work with is <a href="http://unstats.un.org/unsd/amaapi/api/file/6">GDP and its breakdown at constant 2010 prices in US Dollars</a> and it has already been saved in the Data directory. Have a look at the Excel file to see how it is structured and organised</p>
+<pre class="r"><code>UN_GDP_data  &lt;-  read_excel(here::here(&quot;data&quot;, &quot;Download-GDPconstant-USD-countries.xls&quot;), # Excel filename
+                sheet=&quot;Download-GDPconstant-USD-countr&quot;, # Sheet name
+                skip=2) # Number of rows to skip</code></pre>
+<p>The first thing you need to do is to tidy the data, as it is in wide format and you must make it into long, tidy format. Please express all figures in billions (divide values by <code>1e9</code>, or <span class="math inline">\(10^9\)</span>), and you want to rename the indicators into something shorter.</p>
+<blockquote>
+<p>make sure you remove <code>eval=FALSE</code> from the next chunk of R code– I have it there so I could knit the document</p>
+</blockquote>
+<pre class="r"><code>tidy_GDP_data  &lt;- UN_GDP_data %&gt;% 
+  # Pivot data into longer format
+  pivot_longer(cols = &quot;1970&quot;:&quot;2017&quot;, 
+               names_to = &quot;year&quot;, 
+               values_to = &quot;value&quot;) %&gt;% 
+  # Express figures in billions
+  mutate(value = value / 10^9) %&gt;% 
+  # Rename indicators
+  mutate(IndicatorName = case_when(
+    IndicatorName == &quot;Exports of goods and services&quot; ~ &quot;Exports&quot;,
+    IndicatorName == &quot;Imports of goods and services&quot; ~ &quot;Imports&quot;,
+    IndicatorName == &quot;Gross capital formation&quot; ~ &quot;Gross_capital_formation&quot;,
+    IndicatorName == &quot;General government final consumption expenditure&quot; ~ &quot;Government_expenditure&quot;,
+    IndicatorName == &quot;Household consumption expenditure (including Non-profit institutions serving households)&quot; ~  &quot;Household_expenditure&quot;,
+    IndicatorName == &quot;Imports of goods and services&quot; ~ &quot;Imports&quot;,
+    IndicatorName == &quot;Gross Domestic Product (GDP)&quot; ~ &quot;GDP_from_raw_data&quot;,
+    TRUE ~ IndicatorName)
+  )
+
+# Let us compare GDP components for these 3 countries
+country_list &lt;- c(&quot;United States&quot;,&quot;India&quot;, &quot;Germany&quot;)</code></pre>
+<pre class="r"><code>tidy_GDP_data %&gt;% 
+  # Only consider selected countries
+  filter(Country %in% country_list) %&gt;% 
+  # Only consider selected indicator names
+  filter(IndicatorName %in% c(&quot;Gross_capital_formation&quot;, &quot;Exports&quot;, &quot;Government_expenditure&quot;, &quot;Household_expenditure&quot;, &quot;Imports&quot;)) %&gt;% 
+  # Plot the graph, group according to IndicatorName to receive one line per indicator
+  ggplot(aes(x = year, y = value, group = IndicatorName, color = IndicatorName)) + 
+    geom_line() + 
+    facet_wrap(~ Country) + 
+  theme_bw() + 
+  labs(title = &quot;GDP components over time&quot;, 
+       subtitle = &quot;In constant 2010 USD&quot;, 
+       y = &quot;Billion USD&quot;, 
+       x = NULL)</code></pre>
+<p><img src="/blogs/project2_files/figure-html/gdp1%20plot-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Secondly, recall that GDP is the sum of Household Expenditure (Consumption <em>C</em>), Gross Capital Formation (business investment <em>I</em>), Government Expenditure (G) and Net Exports (exports - imports). Even though there is an indicator <code>Gross Domestic Product (GDP)</code> in your dataframe, I would like you to calculate it given its components discussed above.</p>
+<blockquote>
+<p>What is the % difference between what you calculated as GDP and the GDP figure included in the dataframe?</p>
+</blockquote>
+<p>The % difference between the calculated GDP and the GDP figure included in the dataframe is approximately 0.72%. To get to this number, we summed up the calculated GDPs for all years for the relevant indicators of the relevant countries. Then, we divided this sum by the GDP figure included in the dataframe, which was summed up similar to the calculated GDP. Then, we divided the calculated GDP by the GDP figure included in the dataframe.</p>
+<pre class="r"><code>tidy_GDP_data2 &lt;- tidy_GDP_data %&gt;% 
+  filter(IndicatorName %in% c(&quot;Gross_capital_formation&quot;, &quot;Exports&quot;, &quot;Government_expenditure&quot;, &quot;Household_expenditure&quot;, &quot;Imports&quot;, &quot;GDP_from_raw_data&quot;)) %&gt;% 
+  filter(Country %in% country_list) %&gt;% 
+  # Pivot wider to calculate Net Exports
+  pivot_wider(names_from = IndicatorName, 
+              values_from = value) %&gt;% 
+  mutate(Net_exports = Exports - Imports) %&gt;% 
+  # Deselect Exports and Imports because they are no longer needed
+  select(-Exports, -Imports) %&gt;% 
+  # Calculate the GDP based on its components
+  mutate(GDP_calculated = Gross_capital_formation + Net_exports + Government_expenditure + Household_expenditure)
+
+# Find out % difference between calculated GDP and GDP from raw data
+tidy_GDP_data2 %&gt;% 
+  summarise(sum_GDP_raw_data = sum(GDP_from_raw_data), 
+            sum_GDP_calculated = sum(GDP_calculated)) %&gt;% 
+  mutate(difference = sum_GDP_calculated/sum_GDP_raw_data-1)</code></pre>
+<pre><code>## # A tibble: 1 × 3
+##   sum_GDP_raw_data sum_GDP_calculated difference
+##              &lt;dbl&gt;              &lt;dbl&gt;      &lt;dbl&gt;
+## 1          671375.            676204.    0.00719</code></pre>
+<pre class="r"><code># Continue with plot
+tidy_GDP_data3 &lt;- tidy_GDP_data2 %&gt;% 
+  # Calculate GDP component values as percentages of total GDP
+  mutate(Household_expenditure = Household_expenditure / GDP_calculated, 
+         Government_expenditure = Government_expenditure / GDP_calculated, 
+         Gross_capital_formation = Gross_capital_formation / GDP_calculated, 
+         Net_exports = Net_exports / GDP_calculated) %&gt;% 
+  select(-GDP_from_raw_data, -GDP_calculated) %&gt;% 
+  # Pivot longer to facilitate plotting
+  pivot_longer(cols = Household_expenditure:Net_exports, 
+               names_to = &quot;indicator&quot;, 
+               values_to = &quot;value&quot;)
+
+# Plot the data
+ggplot(tidy_GDP_data3, aes(x = year, y = value, group = indicator, color = indicator)) + 
+  geom_line() + 
+  facet_wrap(~Country) + 
+  theme_bw() + 
+  # Set labels to percentages
+  scale_y_continuous(labels = scales::percent) + 
+  labs(title = &quot;GDP and its breakdown at constant 2010 prices in US Dollars&quot;, 
+       y = &quot;Proportion&quot;, 
+       x = NULL)</code></pre>
+<p><img src="/blogs/project2_files/figure-html/gdp2%20plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>head(tidy_GDP_data3)</code></pre>
+<pre><code>## # A tibble: 6 × 5
+##   CountryID Country year  indicator                  value
+##       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;                      &lt;dbl&gt;
+## 1       276 Germany 1970  Household_expenditure    0.552  
+## 2       276 Germany 1970  Government_expenditure   0.177  
+## 3       276 Germany 1970  Gross_capital_formation  0.280  
+## 4       276 Germany 1970  Net_exports             -0.00857
+## 5       276 Germany 1971  Household_expenditure    0.561  
+## 6       276 Germany 1971  Government_expenditure   0.182</code></pre>
+<blockquote>
+<p>What is this last chart telling you? Can you explain in a couple of paragraphs the different dynamic among these three countries?</p>
+</blockquote>
+<p>In Germany, the only GDP component that has been growing for the past 20 years is net exports. This indicates that German economic growth is fueled by exporting more than importing. Government expenditure is relatively stable. This indicates that the government isn’t investing heavily in the moment, which is sadly true and which explains why Germany is very backward in terms of internet access and future technology adoption (like 5G networks). Gross capital formation (also called “investment”) has been going down lightly for the past 50 years, indicating that German businesses don’t invest as heavily as they used to. Relative German household expenditure has been stable. This makes sense when considering that the German population isn’t growing, it is rather shrinking and only an immigration influx has been stablilizing it.</p>
+<p>The chart looks very different for India. There, relative household expenditure has dropped from around 70% in 1970 to around 55%. In the same time period, gross capital formation has been going up by 15%. This indicates that Indian companies are investing heavily at the moment. Furthermore, government expenditure has been mostly stable at around 10%, which is half as much as Germany. The frugality of the Indian government probably stems from the fact that India is not yet as highly developed as Germany. Interestingly, net exports has been mostly negative in the past 50 years. This indicates that India is reliant on imports from other countries because they import more than they export.</p>
+<p>In the US, the component that is growing the most is household expenditure, now at about 70%. In Germany, this is currently only 55%. This indicates that the US economy focuses more on producing for their own population compared to Germany focusing a bit more on exporting goods. This makes sense as the US market is extremely strong. In addition, the US have negative net exports, currently at around -5%. Relative government expenditure has been decreasing, from around 25% in 1970 to around 15% in 2016. In Germany, this value is at around 20% in 2016. This indicates that the US isn’t investing heavily at the moment, growth rather stems from household expenditure.</p>
+</div>
