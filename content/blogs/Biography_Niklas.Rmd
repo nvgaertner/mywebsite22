@@ -1,0 +1,50 @@
+---
+title: "Aliquam"
+description: "Nullam et orci eu lorem consequat tincidunt vivamus et sagittis magna sed nunc rhoncus condimentum sem. In efficitur ligula tate urna. Maecenas massa sed magna lacinia magna pellentesque lorem ipsum dolor. Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis tempus."
+slug: "aliquam"
+image: pic07.jpg
+keywords: ""
+categories: 
+    - ""
+    - ""
+date: 2017-10-31T22:42:51-05:00
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I am Niklas and I am 22 years old. In these 22 years I made many interesting experiences and learned a lot about all kinds of different topics. I will now tell you what you should know about my life. 
+
+
+## Football
+
+The first thing you need to know about me is that I love **football**. My favorite football clubs include *Mainz 05*, *Borussia Dortmund* and *FC Barcelona*. 
+
+
+## Food
+
+The second thing you should remember about me is that I am very organized. In the following, I prepared a short and ordered list of my favorite cuisines with respective dishes as sub-items: 
+
+1. Italian cuisine
+
+    + Pasta with eggplant sauce
+    + Pasta Arrabiata
+    + Pizza
+  
+2. Israeli cuisine 
+
+    + Sabich
+    + Shakshuka
+  
+For your information: Sabich is a pita sandwich which contains grilled eggplants, salad, Hummus and other dips and a boiled egg. It is mouthwateringly delicious and it is the sole reason why I need to go back to Israel for a third time. 
+
+
+## The end
+
+Thank you very much for reading through this! If you want to be in touch, be sure to check out my LinkedIn profile:  [link](https://linkedin.com/in/niklasgaertner)
+
+In the spirit of this task, I would like to leave you with happy thoughts by showing you this image: 
+
+![](https://upload.wikimedia.org/wikipedia/en/a/a5/Donald_Duck_angry_transparent_background.png)
