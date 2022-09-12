@@ -1,7 +1,7 @@
 ---
 title: "Project 2: GDP components"
 description: "Examine the influencing drivers of GDP"
-slug: "project1"
+slug: "project2"
 image: project2.jpg
 keywords: ""
 categories: 
